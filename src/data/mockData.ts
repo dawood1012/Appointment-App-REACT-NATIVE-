@@ -1,0 +1,52 @@
+import { Doctor } from '../types';
+
+export const MOCK_DOCTORS: Doctor[] = [
+    {
+        id: '1',
+        name: 'Dr. Wilson',
+        specialization: 'Cardiologist',
+        experience: 8,
+        rating: 4.8,
+        reviews: 124,
+        consultationFee: 80,
+        about: 'Dr. Wilson is a renowned Cardiologist with over 8 years of experience in treating heart diseases. She is known for her compassionate care.',
+        image: 'https://i.pravatar.cc/150?u=a042581f4e29026024d',
+        availableSlots: ['09:00 AM', '10:00 AM', '02:00 PM', '04:00 PM'],
+    },
+    {
+        id: '2',
+        name: 'Dr. John Roberts',
+        specialization: 'Dermatologist',
+        experience: 5,
+        rating: 4.6,
+        reviews: 89,
+        consultationFee: 60,
+        about: 'Dr. John Roberts specializes in skin care and has helped hundreds of patients achieve healthy skin.',
+        image: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+        availableSlots: ['11:00 AM', '01:00 PM', '03:00 PM'],
+    },
+    {
+        id: '3',
+        name: 'Dr. Emily Chen',
+        specialization: 'Pediatrician',
+        experience: 10,
+        rating: 4.9,
+        reviews: 200,
+        consultationFee: 90,
+        about: 'Dr. Emily Chen is a trusted Pediatrician who loves working with children and ensuring their health and well-being.',
+        image: 'https://i.pravatar.cc/150?u=a042581f4e29026704e',
+        availableSlots: ['09:30 AM', '11:30 AM', '05:00 PM'],
+    },
+    {
+        id: '4',
+        name: 'Dr. Michael Brown',
+        specialization: 'Neurologist',
+        experience: 15,
+        rating: 4.7,
+        reviews: 150,
+        consultationFee: 120,
+        about: 'Dr. Michael Brown is a highly experienced Neurologist focusing on brain and nervous system disorders.',
+        image: 'https://i.pravatar.cc/150?u=a042581f4e29026704f',
+        availableSlots: ['10:00 AM', '12:00 PM', '02:00 PM'],
+    }
+];

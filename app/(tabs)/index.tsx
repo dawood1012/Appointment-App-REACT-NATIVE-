@@ -1,98 +1,159 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { CustomInput } from '../../src/components/CustomInput';
+import { DoctorCard } from '../../src/components/DoctorCard';
+import { useAuth } from '../../src/context/AuthContext';
+import { MOCK_DOCTORS } from '../../src/data/mockData';
+import { Colors, Spacing } from '../../src/theme';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
+  const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const filteredDoctors = MOCK_DOCTORS.filter(
+    (doc) =>
+      doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.specialization.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.padding}>
+        <View style={styles.topBar}>
+          <View>
+            <Text style={styles.greeting}>Hello, {user?.name || 'Guest'}</Text>
+            <Text style={styles.subtext}>How do you feel today?</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.notificationBtn}
+            onPress={() => { }}
+          >
+            <Ionicons name="notifications-outline" size={24} color={Colors.text} />
+          </TouchableOpacity>
+        </View>
+
+        <CustomInput
+          placeholder="Search doctor or category..."
+          icon="search-outline"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          containerStyle={styles.searchContainer}
+        />
+      </View>
+
+      <FlatList
+        data={filteredDoctors}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <DoctorCard
+            doctor={item}
+            onPress={() => router.push({ pathname: '/doctor/[id]', params: { id: item.id } })}
+          />
+        )}
+        contentContainerStyle={styles.listContent}
+        ListHeaderComponent={() => (
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Top Doctors</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>See All</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+      />
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => router.push('/chat')}
+      >
+        <Ionicons name="chatbubbles" size={24} color="#fff" />
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  padding: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+  },
+  topBar: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: Spacing.lg,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  greeting: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Colors.text,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  subtext: {
+    fontSize: 14,
+    color: Colors.textLight,
+  },
+  notificationBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+  },
+  searchContainer: {
+    marginBottom: Spacing.md,
+  },
+  listContent: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.xl,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    marginTop: Spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.text,
+  },
+  seeAll: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  fab: {
     position: 'absolute',
+    bottom: Spacing.xl + 20, // Avoid tab bar if possible or sit above it. 
+    // Since tab bar is part of layout, using simple absolute. 
+    // In expo tabs, it might overlap bottom area, better to put enough margin.
+    right: Spacing.lg,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
 });
